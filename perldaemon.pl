@@ -18,6 +18,21 @@ sub trimstr (@) {
 	return @str;
 }
 
+sub logmsg ($$) {
+	my ($config, $msg) = @_;
+	my $logfile = $config->{logfile};
+
+	open my $fh, ">>$logfile" or die "Can't write logfile: $!\n";
+	print $fh localtime().": $msg\n";
+	close $fh;
+}
+
+sub err ($$) {
+	my ($config, $msg) = @_;
+	logmsg $config => $msg;	
+	die "$msg\n";
+}
+
 sub readconfig ($) {
 	my $configfile = shift;
 
@@ -34,32 +49,44 @@ sub readconfig ($) {
 		$config{$key} = $val;	
 	}
 
+	close $fh;
+
 	# Check
 	my $msg = 'Missing property:';
 
-	foreach (qw(wd pidfile)) {
+	foreach (qw(wd pidfile logfile)) {
 		my $key = "daemon.$_";
 		die "$msg $key\n" unless exists $config{$key};
 	}
 
+	logmsg \%config => "Reading $configfile complete";
 	return \%config;
 }
 
 sub daemonize ($) {
 	my $config = shift;
+	logmsg $config => 'Daemonizing...';
 
-	chdir $config->{wd} or die "Can't chdir to wd: $!\n";
+	chdir $config->{wd} or err $config => "Can't chdir to wd: $!";
 
 	my $msg = 'Can\'t read /dev/null:';
 
-	open STDIN, '>/dev/null' or die "$msg $!\n";
-	open STDOUT, '>/dev/null' or die "$msg $!\n";
-	open STDERR, '>/dev/null' or die "$msg $!\n";
+	open STDIN, '>/dev/null' or err $config => "$msg $!";
+	open STDOUT, '>/dev/null' or err $config => "$msg $!";
+	open STDERR, '>/dev/null' or err $config => "$msg $!";
 
-	defined (my $pid = fork) or die "Can't fork: $!\n";	
+	defined (my $pid = fork) or err $config => "Can't fork: $!";	
 	exit if $pid;
 	
-	setsid or die "Can't start a new session: $!\n";
+	setsid or err $config => "Can't start a new session: $!";
+
+	my $pidfile = $config->{pidfile};
+
+	open my $fh, ">$pidfile" or err $config => "Can't write pidfile: $!";
+	print $fh $$;
+	close $fh;
+
+	logmsg $config => 'Daemonizing completed';
 }
 
 sub signals ($) {
@@ -70,13 +97,14 @@ sub daemonloop ($) {
 	my $config = shift;
 
 	for (;;) {
+		logmsg $config => 'Hello';
 		sleep 1;
 	}
 }
 
 my $config = readconfig shift;
 
-#daemonize $config;
+daemonize $config;
 signals $config;
 daemonloop $config;
 
