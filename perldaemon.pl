@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 use POSIX qw(setsid);
+use Shell qw(ps);
 
 sub trimstr (@) {
 	my @str = @_;
@@ -20,10 +21,10 @@ sub trimstr (@) {
 
 sub logmsg ($$) {
 	my ($config, $msg) = @_;
-	my $logfile = $config->{logfile};
+	my $logfile = $config->{'daemon.logfile'};
 
-	open my $fh, ">>$logfile" or die "Can't write logfile: $!\n";
-	print $fh localtime().": $msg\n";
+	open my $fh, ">>$logfile" or die "Can't write logfile $logfile: $!\n";
+	print $fh localtime()." (PID $$): $msg\n";
 	close $fh;
 }
 
@@ -32,6 +33,35 @@ sub err ($$) {
 	logmsg $config => $msg;	
 	die "$msg\n";
 }
+
+sub checkpid ($) {
+	my $config = shift;
+
+	my $pidfile = $config->{'daemon.pidfile'};
+	my $pid;
+
+	if (-f $pidfile) {
+		open my $fh, $pidfile or err $config => "Can't read pidfile: $!";
+		$pid = <$fh>;
+		close $fh;
+	}
+
+	if (0 > int $pid) {
+		err $config => "Process with pid $pid already running\n" 
+			unless ps('-p', $pid);
+	}
+}
+
+sub writepid ($) {
+	my $config = shift;
+
+	my $pidfile = $config->{'daemon.pidfile'};
+
+	open my $fh, ">$pidfile" or err $config => "Can't write pidfile: $!";
+	print $fh $$;
+	close $fh;
+}
+
 
 sub readconfig ($) {
 	my $configfile = shift;
@@ -54,7 +84,7 @@ sub readconfig ($) {
 	# Check
 	my $msg = 'Missing property:';
 
-	foreach (qw(wd pidfile logfile)) {
+	foreach (qw(wd pidfile logfile truncatelog)) {
 		my $key = "daemon.$_";
 		die "$msg $key\n" unless exists $config{$key};
 	}
@@ -67,7 +97,7 @@ sub daemonize ($) {
 	my $config = shift;
 	logmsg $config => 'Daemonizing...';
 
-	chdir $config->{wd} or err $config => "Can't chdir to wd: $!";
+	chdir $config->{'daemon.wd'} or err $config => "Can't chdir to wd: $!";
 
 	my $msg = 'Can\'t read /dev/null:';
 
@@ -80,32 +110,37 @@ sub daemonize ($) {
 	
 	setsid or err $config => "Can't start a new session: $!";
 
-	my $pidfile = $config->{pidfile};
-
-	open my $fh, ">$pidfile" or err $config => "Can't write pidfile: $!";
-	print $fh $$;
-	close $fh;
+	writepid $config;
 
 	logmsg $config => 'Daemonizing completed';
 }
 
-sub signals ($) {
+sub prestartup ($) {
 	my $config = shift;
+	checkpid $config;
+ 
+	if ($config->{'daemon.truncatelog'} eq 'yes') {
+		my $logfile = $config->{'daemon.logfile'};
+		open my $fh, ">$logfile" or die "Can't write logfile $logfile: $!\n";
+		print $fh '';
+		close $fh;
+	}
 }
 
 sub daemonloop ($) {
 	my $config = shift;
 
-	for (;;) {
-		logmsg $config => 'Hello';
-		sleep 1;
+	my $loop = shift;
+	for (my $i = 1;;++$i) {
+		logmsg $config => "Hello $i";
+		sleep 10;
 	}
 }
 
 my $config = readconfig shift;
 
-daemonize $config;
-signals $config;
+#daemonize $config;
+prestartup $config;
 daemonloop $config;
 
 
