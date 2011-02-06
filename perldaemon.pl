@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use POSIX qw(setsid);
+use POSIX qw(setsid strftime);
 use Shell qw(mv);
 
 use constant VERSION => 1;
@@ -51,10 +51,7 @@ sub rotatelog ($) {
 
 	logmsg $config => 'Rotating logfile';	
 
-	my @t = localtime();
-	$t[5] += 1900;
-	my $timestr = "$t[5]$t[4]$t[3]-$t[2]$t[1]$t[0]";
-
+	my $timestr = strftime "%Y%m%d-%H%M%S", localtime();
 	mv($logfile, "$logfile.$timestr");	
 }
 
