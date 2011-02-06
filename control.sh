@@ -6,11 +6,11 @@ case $1 in
 	;;
 
 	stop)
-	kill $(cat perldaemon.pid)
+	kill $(cat ./run/perldaemon.pid)
 	;;
 
 	logrotate)
-	kill -HUP $(cat perldaemon.pid)
+	kill -HUP $(cat ./run/perldaemon.pid)
 	;;
 
 	*)
