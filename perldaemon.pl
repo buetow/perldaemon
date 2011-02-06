@@ -52,9 +52,11 @@ sub checkpid ($) {
 	open my $fh, $pidfile or err $config => "Can't read pidfile $pidfile: $!";
 	my ($pid) = <$fh>;
 	close $fh;
-	chomp $pid;
 
-	err $config => "Process with pid $pid already running" if 0 < int $pid && kill 0, $pid;
+	if (defined $pid) {
+		chomp $pid;
+		err $config => "Process with pid $pid already running" if 0 < int $pid && kill 0, $pid;
+	}
 }
 
 sub writepid ($) {
