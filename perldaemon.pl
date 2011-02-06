@@ -5,7 +5,8 @@
 use strict;
 use warnings;
 use POSIX qw(setsid);
-use Shell qw(ps);
+
+$| = 1;
 
 sub trimstr (@) {
 	my @str = @_;
@@ -17,6 +18,13 @@ sub trimstr (@) {
 	}
 
 	return @str;
+}
+
+sub trunc ($) {
+	my $file = shift;
+	open my $fh, ">$file" or die "Can't write $file: $!\n";
+	print $fh '';
+	close $fh;
 }
 
 sub logmsg ($$) {
@@ -38,18 +46,15 @@ sub checkpid ($) {
 	my $config = shift;
 
 	my $pidfile = $config->{'daemon.pidfile'};
-	my $pid;
 
-	if (-f $pidfile) {
-		open my $fh, $pidfile or err $config => "Can't read pidfile: $!";
-		$pid = <$fh>;
-		close $fh;
-	}
+	trunc $pidfile unless -f $pidfile;
 
-	if (0 > int $pid) {
-		err $config => "Process with pid $pid already running\n" 
-			unless ps('-p', $pid);
-	}
+	open my $fh, $pidfile or err $config => "Can't read pidfile $pidfile: $!";
+	my ($pid) = <$fh>;
+	close $fh;
+	chomp $pid;
+
+	err $config => "Process with pid $pid already running" if 0 < int $pid && kill 0, $pid;
 }
 
 sub writepid ($) {
@@ -58,7 +63,7 @@ sub writepid ($) {
 	my $pidfile = $config->{'daemon.pidfile'};
 
 	open my $fh, ">$pidfile" or err $config => "Can't write pidfile: $!";
-	print $fh $$;
+	print $fh "$$\n";
 	close $fh;
 }
 
@@ -118,13 +123,8 @@ sub daemonize ($) {
 sub prestartup ($) {
 	my $config = shift;
 	checkpid $config;
- 
-	if ($config->{'daemon.truncatelog'} eq 'yes') {
-		my $logfile = $config->{'daemon.logfile'};
-		open my $fh, ">$logfile" or die "Can't write logfile $logfile: $!\n";
-		print $fh '';
-		close $fh;
-	}
+
+	trunc $config->{'daemon.logfile'} if $config->{'daemon.truncatelog'} eq 'yes';
 }
 
 sub daemonloop ($) {
@@ -133,14 +133,14 @@ sub daemonloop ($) {
 	my $loop = shift;
 	for (my $i = 1;;++$i) {
 		logmsg $config => "Hello $i";
-		sleep 10;
+		sleep 3;
 	}
 }
 
 my $config = readconfig shift;
 
-#daemonize $config;
 prestartup $config;
+daemonize $config;
 daemonloop $config;
 
 
