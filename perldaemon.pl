@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 use POSIX qw(setsid);
+use Shell qw(mv);
 
 use constant VERSION => 1;
 
@@ -42,6 +43,19 @@ sub err ($$) {
 	my ($config, $msg) = @_;
 	logmsg $config => $msg;	
 	die "$msg\n";
+}
+
+sub rotatelog ($) {
+	my $config = shift;
+	my $logfile = $config->{'daemon.logfile'};
+
+	logmsg $config => 'Rotating logfile';	
+
+	my @t = localtime();
+	$t[5] += 1900;
+	my $timestr = "$t[5]$t[4]$t[3]-$t[2]$t[1]$t[0]";
+
+	mv($logfile, "$logfile.$timestr");	
 }
 
 sub checkpid ($) {
@@ -93,7 +107,7 @@ sub readconfig ($) {
 	# Check
 	my $msg = 'Missing property:';
 
-	foreach (qw(wd pidfile logfile truncatelog)) {
+	foreach (qw(wd pidfile logfile)) {
 		my $key = "daemon.$_";
 		die "$msg $key\n" unless exists $config{$key};
 	}
@@ -124,11 +138,26 @@ sub daemonize ($) {
 	logmsg $config => 'Daemonizing completed';
 }
 
+sub sighandlers ($) {
+	my $config = shift;
+
+	$SIG{TERM} = sub {
+		# On shutdown
+		logmsg $config => 'Received SIGTERM. Shutting down....';
+		unlink $config->{'daemon.pidfile'};
+		exit 0;
+	};
+
+	$SIG{HUP} = sub {
+		# On logrotate
+		logmsg $config => 'Received SIGHUP.';
+		rotatelog $config;
+	};
+}
+
 sub prestartup ($) {
 	my $config = shift;
 	checkpid $config;
-
-	trunc $config->{'daemon.logfile'} if $config->{'daemon.truncatelog'} eq 'yes';
 }
 
 sub daemonloop ($) {
@@ -145,6 +174,7 @@ my $config = readconfig shift;
 
 prestartup $config;
 daemonize $config;
+sighandlers $config;
 daemonloop $config;
 
 
