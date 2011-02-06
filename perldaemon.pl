@@ -89,7 +89,7 @@ sub readconfig ($) {
 	# Check
 	my $msg = 'Missing property:';
 
-	foreach (qw(wd pidfile logfile truncatelog)) {
+	foreach (qw(wd pidfile logfile truncatelog version)) {
 		my $key = "daemon.$_";
 		die "$msg $key\n" unless exists $config{$key};
 	}
@@ -132,7 +132,7 @@ sub daemonloop ($) {
 
 	my $loop = shift;
 	for (my $i = 1;;++$i) {
-		logmsg $config => "Hello $i";
+		logmsg $config => $config->{'daemon.version'} .  ": Hello $i";
 		sleep 3;
 	}
 }
