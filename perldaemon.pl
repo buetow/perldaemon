@@ -6,6 +6,8 @@ use strict;
 use warnings;
 use POSIX qw(setsid);
 
+use constant VERSION => 1;
+
 $| = 1;
 
 sub trimstr (@) {
@@ -91,7 +93,7 @@ sub readconfig ($) {
 	# Check
 	my $msg = 'Missing property:';
 
-	foreach (qw(wd pidfile logfile truncatelog version)) {
+	foreach (qw(wd pidfile logfile truncatelog)) {
 		my $key = "daemon.$_";
 		die "$msg $key\n" unless exists $config{$key};
 	}
@@ -134,7 +136,7 @@ sub daemonloop ($) {
 
 	my $loop = shift;
 	for (my $i = 1;;++$i) {
-		logmsg $config => $config->{'daemon.version'} .  ": Hello $i";
+		logmsg $config => VERSION .  ": Hello $i";
 		sleep 3;
 	}
 }
