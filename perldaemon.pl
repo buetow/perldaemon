@@ -7,7 +7,7 @@ use warnings;
 use POSIX qw(setsid strftime);
 use Shell qw(mv);
 
-use constant VERSION => 1;
+use constant VERSION => 'Daemon v1';
 
 $| = 1;
 
