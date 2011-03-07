@@ -4,15 +4,55 @@
 
 use strict;
 use warnings;
-use POSIX qw(setsid strftime);
-use Shell qw(mv);
 
-use constant VERSION => 'Daemon v1';
+package Logger;
+
+use Shell qw(mv);
+use POSIX qw(strftime);
+$| = 1;
+
+sub new ($$) {
+	my ($class, $conf) = @_;
+	return bless { conf => $conf }, $class;
+}
+
+sub logmsg ($$) {
+	my ($self, $msg) = @_;
+	my $conf = $self->{conf};
+	my $logfile = $conf->{'daemon.logfile'};
+
+	open my $fh, ">>$logfile" or die "Can't write logfile $logfile: $!\n";
+	print $fh localtime()." (PID $$): $msg\n";
+	close $fh;
+}
+
+sub err ($$) {
+	my ($self, $msg) = @_;
+	$self->logmsg($msg);
+	die "$msg\n";
+}
+
+sub rotatelog ($) {
+	my $self = shift;
+	my $conf = $self->{conf};
+	my $logfile = $conf->{'daemon.logfile'};
+
+	$self->logmsg('Rotating logfile');
+
+	my $timestr = strftime "%Y%m%d-%H%M%S", localtime();
+	mv($logfile, "$logfile.$timestr");	
+}
+
+package PerlDaemon;
+
+use POSIX qw(setsid);
+use DaemonLogic;
 
 $| = 1;
 
 sub trimstr (@) {
-	my @str = @_;
+	my @str = 
+		@_;
 
 	for (@str) {
 		chomp;
@@ -30,64 +70,40 @@ sub trunc ($) {
 	close $fh;
 }
 
-sub logmsg ($$) {
-	my ($config, $msg) = @_;
-	my $logfile = $config->{'daemon.logfile'};
-
-	open my $fh, ">>$logfile" or die "Can't write logfile $logfile: $!\n";
-	print $fh localtime()." (PID $$): $msg\n";
-	close $fh;
-}
-
-sub err ($$) {
-	my ($config, $msg) = @_;
-	logmsg $config => $msg;	
-	die "$msg\n";
-}
-
-sub rotatelog ($) {
-	my $config = shift;
-	my $logfile = $config->{'daemon.logfile'};
-
-	logmsg $config => 'Rotating logfile';	
-
-	my $timestr = strftime "%Y%m%d-%H%M%S", localtime();
-	mv($logfile, "$logfile.$timestr");	
-}
-
 sub checkpid ($) {
-	my $config = shift;
-
-	my $pidfile = $config->{'daemon.pidfile'};
+	my $conf = shift;
+	my $pidfile = $conf->{'daemon.pidfile'};
+	my $logger = $conf->{logger};
 
 	trunc $pidfile unless -f $pidfile;
 
-	open my $fh, $pidfile or err $config => "Can't read pidfile $pidfile: $!";
+	open my $fh, $pidfile or $logger->err("Can't read pidfile $pidfile: $!");
 	my ($pid) = <$fh>;
 	close $fh;
 
 	if (defined $pid) {
 		chomp $pid;
-		err $config => "Process with pid $pid already running" if 0 < int $pid && kill 0, $pid;
+		$logger->err("Process with pid $pid already running") if 0 < int $pid && kill 0, $pid;
 	}
 }
 
 sub writepid ($) {
-	my $config = shift;
+	my $conf = shift;
+	my $logger = $conf->{logger};
 
-	my $pidfile = $config->{'daemon.pidfile'};
+	my $pidfile = $conf->{'daemon.pidfile'};
 
-	open my $fh, ">$pidfile" or err $config => "Can't write pidfile: $!";
+	open my $fh, ">$pidfile" or $logger->err("Can't write pidfile: $!");
 	print $fh "$$\n";
 	close $fh;
 }
 
 
-sub readconfig ($) {
-	my $configfile = shift;
+sub readconf ($) {
+	my $conffile = shift;
 
-	open my $fh, $configfile or die "Can't read $configfile\n";
-	my %config;
+	open my $fh, $conffile or die "Can't read $conffile\n";
+	my %conf;
 	
 	while (<$fh>) {
 		next if /^[\t\w]+#/;
@@ -96,7 +112,7 @@ sub readconfig ($) {
 		my ($key, $val) = trimstr split '=', $_, 2;
 		next unless defined $val;
 
-		$config{$key} = $val;	
+		$conf{$key} = $val;	
 	}
 
 	close $fh;
@@ -106,72 +122,74 @@ sub readconfig ($) {
 
 	foreach (qw(wd pidfile logfile)) {
 		my $key = "daemon.$_";
-		die "$msg $key\n" unless exists $config{$key};
+		die "$msg $key\n" unless exists $conf{$key};
 	}
 
-	logmsg \%config => "Reading $configfile complete";
-	return \%config;
+	return \%conf;
 }
 
 sub daemonize ($) {
-	my $config = shift;
-	logmsg $config => 'Daemonizing...';
+	my $conf = shift;
+	my $logger = $conf->{logger};
+	$logger->logmsg('Daemonizing...');
 
-	chdir $config->{'daemon.wd'} or err $config => "Can't chdir to wd: $!";
+	chdir $conf->{'daemon.wd'} or $logger->err("Can't chdir to wd: $!");
 
 	my $msg = 'Can\'t read /dev/null:';
 
-	open STDIN, '>/dev/null' or err $config => "$msg $!";
-	open STDOUT, '>/dev/null' or err $config => "$msg $!";
-	open STDERR, '>/dev/null' or err $config => "$msg $!";
+	open STDIN, '>/dev/null' or $logger->err("$msg $!");
+	open STDOUT, '>/dev/null' or $logger->err("$msg $!");
+	open STDERR, '>/dev/null' or $logger->err("$msg $!");
 
-	defined (my $pid = fork) or err $config => "Can't fork: $!";	
+	defined (my $pid = fork) or $logger->err("Can't fork: $!");	
 	exit if $pid;
 	
-	setsid or err $config => "Can't start a new session: $!";
+	setsid or $logger->err("Can't start a new session: $!");
 
-	writepid $config;
-
-	logmsg $config => 'Daemonizing completed';
+	writepid $conf;
+	$logger->logmsg('Daemonizing completed');
 }
 
 sub sighandlers ($) {
-	my $config = shift;
+	my $conf = shift;
+	my $logger = $conf->{logger};
 
 	$SIG{TERM} = sub {
 		# On shutdown
-		logmsg $config => 'Received SIGTERM. Shutting down....';
-		unlink $config->{'daemon.pidfile'};
+		$logger->logmsg('Received SIGTERM. Shutting down....');
+		unlink $conf->{'daemon.pidfile'};
 		exit 0;
 	};
 
 	$SIG{HUP} = sub {
 		# On logrotate
-		logmsg $config => 'Received SIGHUP.';
-		rotatelog $config;
+		$logger->logmsg('Received SIGHUP.');
+		$logger->rotatelog();
 	};
 }
 
 sub prestartup ($) {
-	my $config = shift;
-	checkpid $config;
+	my $conf = shift;
+	checkpid $conf;
 }
 
 sub daemonloop ($) {
-	my $config = shift;
+	my $conf = shift;
+	my $dlogic = DaemonLogic->new($conf);
 
 	my $loop = shift;
 	for (my $i = 1;;++$i) {
-		logmsg $config => VERSION .  ": Hello $i";
+		$dlogic->do();
 		sleep 3;
 	}
 }
 
-my $config = readconfig shift;
+my $conf = readconf shift;
+$conf->{logger} = Logger->new($conf);
 
-prestartup $config;
-daemonize $config;
-sighandlers $config;
-daemonloop $config;
+prestartup $conf;
+daemonize $conf;
+sighandlers $conf;
+daemonloop $conf;
 
 
