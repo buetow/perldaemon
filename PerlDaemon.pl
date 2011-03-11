@@ -83,7 +83,7 @@ sub readconf ($) {
 	# Check
 	my $msg = 'Missing property:';
 
-	foreach (qw(wd pidfile logfile)) {
+	foreach (qw(wd loopinterval alivefile pidfile logfile)) {
 		my $key = "daemon.$_";
 		die "$msg $key\n" unless exists $conf{$key};
 	}
@@ -136,14 +136,20 @@ sub prestartup ($) {
 	checkpid $conf;
 }
 
+sub alive ($) {
+	my $conf = shift;
+}
+
 sub daemonloop ($) {
 	my $conf = shift;
 	my $dlogic = DaemonLogic->new($conf);
+	my $loopinterval = $conf->{'daemon.loopinterval'};
 
 	my $loop = shift;
 	for (my $i = 1;;++$i) {
 		$dlogic->do();
-		sleep 3;
+		sleep $loopinterval;
+		alive $conf;
 	}
 }
 
