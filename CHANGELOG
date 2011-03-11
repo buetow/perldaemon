@@ -1,3 +1,6 @@
+Fr 11. Mär 08:54:39 CET 2011
+* New property: daemon.loopinterval
+
 Mo 7. Mär 21:43:23 CET 2011
 * Introduced simple OOP to the PerlDaemon 
   Added a Logger and a DaemonLogic class.
