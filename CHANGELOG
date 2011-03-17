@@ -1,6 +1,7 @@
-Do 17. Mär 08:58:18 CET 2011
+Do 17. Mär 09:10:38 CET 2011
 * Renamed DaemonLogic into RunModule
-* Added ./conf and ./lib subdirs and moved stuff into it
+* Added ./conf and ./PerlDaemon subdirs and moved stuff into it
+* Added to all Modules the PerlDaemon:: prefix
 
 Fr 11. Mär 08:54:39 CET 2011
 * New property: daemon.loopinterval

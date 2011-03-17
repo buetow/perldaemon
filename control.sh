@@ -2,7 +2,7 @@
 
 case $1 in
 	start)
-	perl PerlDaemon.pl ./conf/perldaemon.conf
+	perl PerlDaemon/PerlDaemon.pl ./conf/perldaemon.conf
 	;;
 
 	stop)

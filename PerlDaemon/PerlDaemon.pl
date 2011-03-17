@@ -142,7 +142,7 @@ sub alive ($) {
 
 sub daemonloop ($) {
 	my $conf = shift;
-	my $rmodule = RunModule->new($conf);
+	my $rmodule = PerlDaemon::RunModule->new($conf);
 	my $loopinterval = $conf->{'daemon.loopinterval'};
 
 	my $loop = shift;
@@ -154,7 +154,7 @@ sub daemonloop ($) {
 }
 
 my $conf = readconf shift;
-$conf->{logger} = Logger->new($conf);
+$conf->{logger} = PerlDaemon::Logger->new($conf);
 
 prestartup $conf;
 daemonize $conf;
