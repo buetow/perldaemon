@@ -8,8 +8,8 @@ use warnings;
 use Shell qw(mv);
 use POSIX qw(setsid strftime);
 
-use Logger;
-use RunModule;
+use PerlDaemon::Logger;
+use PerlDaemon::RunModule;
 
 $| = 1;
 

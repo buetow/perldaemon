@@ -1,4 +1,4 @@
-package Logger;
+package PerlDaemon::Logger;
 
 use Shell qw(mv);
 use POSIX qw(strftime);

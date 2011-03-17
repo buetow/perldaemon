@@ -1,4 +1,4 @@
-package RunModule;
+package PerlDaemon::RunModule;
 
 sub new ($$$) {
 	my ($class, $conf) = @_;
