@@ -9,7 +9,7 @@ use Shell qw(mv);
 use POSIX qw(setsid strftime);
 
 use Logger;
-use DaemonLogic;
+use RunModule;
 
 $| = 1;
 
@@ -142,12 +142,12 @@ sub alive ($) {
 
 sub daemonloop ($) {
 	my $conf = shift;
-	my $dlogic = DaemonLogic->new($conf);
+	my $rmodule = RunModule->new($conf);
 	my $loopinterval = $conf->{'daemon.loopinterval'};
 
 	my $loop = shift;
 	for (my $i = 1;;++$i) {
-		$dlogic->do();
+		$rmodule->do();
 		sleep $loopinterval;
 		alive $conf;
 	}

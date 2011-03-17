@@ -1,4 +1,4 @@
-package DaemonLogic;
+package RunModule;
 
 sub new ($$$) {
 	my ($class, $conf) = @_;
