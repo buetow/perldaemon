@@ -120,7 +120,7 @@ sub sighandlers ($) {
 	$SIG{TERM} = sub {
 		# On shutdown
 		$logger->logmsg('Received SIGTERM. Shutting down....');
-		unlink $conf->{'daemon.pidfile'};
+		unlink $conf->{'daemon.pidfile'} if -f $conf->{'daemon.pidfile'};
 		exit 0;
 	};
 
