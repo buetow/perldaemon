@@ -1,5 +1,6 @@
 Do 17. Mär 08:58:18 CET 2011
 * Renamed DaemonLogic into RunModule
+* Added ./conf and ./lib subdirs and moved stuff into it
 
 Fr 11. Mär 08:54:39 CET 2011
 * New property: daemon.loopinterval
