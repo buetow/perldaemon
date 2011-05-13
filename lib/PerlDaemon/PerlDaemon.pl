@@ -9,7 +9,7 @@ use Shell qw(mv);
 use POSIX qw(setsid strftime);
 
 use PerlDaemon::Logger;
-use PerlDaemon::RunModule;
+use PerlDaemon::RunModules;
 
 $| = 1;
 
@@ -142,7 +142,7 @@ sub alive ($) {
 
 sub daemonloop ($) {
 	my $conf = shift;
-	my $rmodule = PerlDaemon::RunModule->new($conf);
+	my $rmodule = PerlDaemon::RunModules->new($conf);
 	my $loopinterval = $conf->{'daemon.loopinterval'};
 
 	my $loop = shift;
