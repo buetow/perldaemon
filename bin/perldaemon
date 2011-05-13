@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 declare -a LIBPATHS=(./lib ../lib /lib /usr/lib /usr/local/lib /opt/lib)
 
@@ -9,21 +9,21 @@ for path in ${LIBPATHS[@]}; do
         fi
 done
 
-start () perl -I$LIBDIR $LIBDIR/PerlDaemon/PerlDaemon.pl ./conf/perldaemon.conf
-stop () kill $(cat ./run/perldaemon.pid)
+function startPD () { perl -I$LIBDIR $LIBDIR/PerlDaemon/PerlDaemon.pl ./conf/perldaemon.conf }
+function stopPD () { kill $(cat ./run/perldaemon.pid) }
 
 case $1 in
 	start)
-	start
+	startPD
 	;;
 
 	stop)
-	stop
+	stopPD
 	;;
 
 	restart)
-	stop
-        start
+	stopPD
+        startPD
 	;;
 
 	logrotate)
@@ -35,3 +35,4 @@ case $1 in
 	exit 1
 	;;
 esac
+
