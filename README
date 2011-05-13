@@ -14,14 +14,16 @@ It supports:
 QUICK START GUIDE:
 
 # Starting
-./bin/perldaemon start (or shortcut ./control start)
+ ./bin/perldaemon start (or shortcut ./control start)
 
 # Stopping
-./bin/perldaemon stop (or shortcut ./control stop)
+ ./bin/perldaemon stop (or shortcut ./control stop)
 
 # Writing your own modules:
-cd ./lib/PerlDaemonModules/
-cp ExampleModule.pm YourModule.pm
-vi YourModule.pm
-cd -
-./bin/perldaemon restart (or shortcurt ./control restart)
+ cd ./lib/PerlDaemonModules/
+ cp ExampleModule.pm YourModule.pm
+ vi YourModule.pm
+ cd -
+ ./bin/perldaemon restart (or shortcurt ./control restart)
+
+Btw: You can install as many modules in parallel as whished.
