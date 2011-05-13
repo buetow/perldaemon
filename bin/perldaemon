@@ -29,6 +29,11 @@ stop () {
         fi
 }
 
+logrotate () {
+        echo Triggering a logrotate
+        kill -HUP $(cat ./run/perldaemon.pid)
+}
+
 case $ARG in
 	start)
                 start
@@ -44,7 +49,7 @@ case $ARG in
 	;;
 
 	logrotate)
-                kill -HUP $(cat ./run/perldaemon.pid)
+                logrotate
 	;;
 
 	*)
