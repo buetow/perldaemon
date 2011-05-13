@@ -18,12 +18,21 @@ sub logmsg ($$) {
 	open my $fh, ">>$logfile" or die "Can't write logfile $logfile: $!\n";
 	print $fh localtime()." (PID $$): $msg\n";
 	close $fh;
+
+        return undef;
 }
 
 sub err ($$) {
 	my ($self, $msg) = @_;
 	$self->logmsg($msg);
 	die "$msg\n";
+}
+
+sub warn ($$) {
+	my ($self, $msg) = @_;
+	$self->logmsg("WARNING: $msg");
+
+        return undef;
 }
 
 sub rotatelog ($) {
@@ -35,6 +44,8 @@ sub rotatelog ($) {
 
 	my $timestr = strftime "%Y%m%d-%H%M%S", localtime();
 	mv($logfile, "$logfile.$timestr");	
+
+        return undef;
 }
 
 1;
