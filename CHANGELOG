@@ -1,3 +1,6 @@
+* Added ./bin directory and moved
+* Some minor fixes
+
 Do 17. Mär 09:10:38 CET 2011
 * Renamed DaemonLogic into RunModule
 * Added ./conf and ./PerlDaemon subdirs and moved stuff into it
@@ -8,7 +11,7 @@ Fr 11. Mär 08:54:39 CET 2011
 
 Mo 7. Mär 21:43:23 CET 2011
 * Introduced simple OOP to the PerlDaemon 
-  Added a Logger and a DaemonLogic class.
+* Added a Logger and a DaemonLogic class.
 
 So 6. Feb 13:14:32 CET 2011
 * PerlDaemon is now CamelCase

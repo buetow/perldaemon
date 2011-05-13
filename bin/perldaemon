@@ -1,5 +1,4 @@
-#!/bin/bash -x
-
+#!/bin/bash
 
 declare -a LIBPATHS=(./lib ../lib /lib /usr/lib /usr/local/lib /opt/lib)
 

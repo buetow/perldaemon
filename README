@@ -1,0 +1,27 @@
+HELLO WORLD
+
+RunModuleemon is a minimal linux/unix daemon programmed in Perl. 
+It can be extended to fit any task...
+
+It supports:
+* Automatic daemonizing
+* Logging and logrotate support (SIGHUP)
+* Clean shutdown support (SIGTERM)
+* Pidfile support (incl. check on startup)
+* Easy to configure
+* Easy to extend (writing your own modules within PerlDaemonModules::)
+
+QUICK START GUIDE:
+
+# Starting
+./bin/perldaemon start
+
+# Stopping
+./bin/perldaemon stop
+
+# Writing your own modules:
+cd ./lib/PerlDaemonModules/
+cp ExampleModule.pm YourModule.pm
+vi YourModule.pm
+cd -
+./bin/perldaemon restart
