@@ -14,14 +14,14 @@ It supports:
 QUICK START GUIDE:
 
 # Starting
-./bin/perldaemon start
+./bin/perldaemon start (or shortcut ./control start)
 
 # Stopping
-./bin/perldaemon stop
+./bin/perldaemon stop (or shortcut ./control stop)
 
 # Writing your own modules:
 cd ./lib/PerlDaemonModules/
 cp ExampleModule.pm YourModule.pm
 vi YourModule.pm
 cd -
-./bin/perldaemon restart
+./bin/perldaemon restart (or shortcurt ./control restart)
