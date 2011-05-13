@@ -9,13 +9,21 @@ for path in ${LIBPATHS[@]}; do
         fi
 done
 
+start () perl -I$LIBDIR $LIBDIR/PerlDaemon/PerlDaemon.pl ./conf/perldaemon.conf
+stop () kill $(cat ./run/perldaemon.pid)
+
 case $1 in
 	start)
-	perl -I$LIBDIR $LIBDIR/PerlDaemon/PerlDaemon.pl ./conf/perldaemon.conf
+	start
 	;;
 
 	stop)
-	kill $(cat ./run/perldaemon.pid)
+	stop
+	;;
+
+	restart)
+	stop
+        start
 	;;
 
 	logrotate)
@@ -23,7 +31,7 @@ case $1 in
 	;;
 
 	*)
-	echo "Usage: $0 <start|stop|logrotate>"
+	echo "Usage: $0 <start|stop|restart|logrotate>"
 	exit 1
 	;;
 esac
