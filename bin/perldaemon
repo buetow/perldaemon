@@ -1,8 +1,18 @@
-#!/bin/bash
+#!/bin/bash -x
+
+
+declare -a LIBPATHS=(./lib ../lib /lib /usr/lib /usr/local/lib /opt/lib)
+
+for path in ${LIBPATHS[@]}; do
+        if [ -f $path/PerlDaemon/PerlDaemon.pl ]; then
+                LIBDIR=$path
+                break
+        fi
+done
 
 case $1 in
 	start)
-	perl PerlDaemon/PerlDaemon.pl ./conf/perldaemon.conf
+	perl -I$LIBDIR $LIBDIR/PerlDaemon/PerlDaemon.pl ./conf/perldaemon.conf
 	;;
 
 	stop)
