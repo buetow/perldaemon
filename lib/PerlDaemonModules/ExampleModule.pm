@@ -3,15 +3,24 @@ package PerlDaemonModules::ExampleModule;
 sub new ($$$) {
 	my ($class, $conf) = @_;
 
-	return bless { conf => $conf }, $class;
+	my $self = bless { conf => $conf }, $class;
+
+        # Store some private module stuff
+        $self->{counter} = 0;
+
+        return $self;
 }
 
+# Runs periodically in a loop (set interval in perldaemon.conf)
 sub do ($) {
 	my $self = shift;
 	my $conf = $self->{conf};
 	my $logger = $conf->{logger};
 
-	$logger->logmsg('ExampleModule Test');
+        # Calculate some private module stuff
+        my $count = ++$self->{counter};
+
+	$logger->logmsg("ExampleModule Test $count");
 }
 
 1;

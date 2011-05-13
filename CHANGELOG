@@ -1,5 +1,8 @@
-* Added ./bin directory and moved
-* Some minor fixes
+
+* Major refactoring
+* Added 'restart' option
+* Added README file including a quick starting guide
+* Added separate PerlDaemonModules directory and an example module
 
 Do 17. Mär 09:10:38 CET 2011
 * Renamed DaemonLogic into RunModule
