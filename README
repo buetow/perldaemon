@@ -11,6 +11,8 @@ It supports:
 * Easy to configure
 * Easy to extend (writing your own modules within PerlDaemonModules::)
 
+The perldaemon website is located at http://perldaemon.buetow.org
+
 QUICK START GUIDE:
 
 # Starting

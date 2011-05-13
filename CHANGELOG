@@ -1,8 +1,10 @@
-
+Fr 13. Mai 18:21:08 CEST 2011
+* Released PerlDaemon v1.1
 * Major refactoring
+* Added warn message support
 * Added 'restart' option
 * Added README file including a quick starting guide
-* Added separate PerlDaemonModules directory and an example module
+* Added dynamic loadable module support including an example
 
 Do 17. Mär 09:10:38 CET 2011
 * Renamed DaemonLogic into RunModule
