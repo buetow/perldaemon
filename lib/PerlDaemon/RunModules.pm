@@ -48,8 +48,8 @@ sub do ($) {
         } else {
                 while (my ($k, $v) = each %$modules) {
                         $logger->logmsg("Triggering $k");
-                        $v->do();
                         $scheduler->{$k}{lastrun} = gettimeofday;
+                        $v->do();
                 }
         }
 }
