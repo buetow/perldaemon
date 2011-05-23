@@ -49,7 +49,7 @@ sub do ($) {
                 while (my ($k, $v) = each %$modules) {
                         $logger->logmsg("Triggering $k");
                         $v->do();
-                        $scheduler->{$k} = gettimeofday;
+                        $scheduler->{$k}{lastrun} = gettimeofday;
                 }
         }
 }
