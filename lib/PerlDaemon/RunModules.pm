@@ -22,6 +22,7 @@ sub new ($$$) {
                 for my $name (grep /PerlDaemonModules/, keys %INC) {
                         $name =~ s#.*(PerlDaemonModules)/(.*)\.pm$#$1::$2#;
                         $logger->logmsg("Creating module instance of $name");
+                        # TODO: Add eval catching jost un case for errors
                         $loadedmodules{$name} = eval "${name}->new(\$conf)";
                         $scheduler{$name}{lastrun} = 0.0;
                         $scheduler{$name}{interval} = $conf->{modulesruninterval};
