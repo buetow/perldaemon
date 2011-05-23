@@ -1,5 +1,7 @@
 package PerlDaemon::RunModules;
 
+use Time::HiRes qw(gettimeofday tv_interval);
+
 sub new ($$$) {
 	my ($class, $conf) = @_;
 
@@ -8,6 +10,7 @@ sub new ($$$) {
 	my $modulesdir = $conf->{'daemon.modulesdir'};
 	my $logger = $conf->{logger};
         my %loadedmodules;
+        my %scheduler;
 
         if (-d $modulesdir) {
                 $logger->logmsg("Loading modules from $modulesdir");
@@ -20,6 +23,8 @@ sub new ($$$) {
                         $name =~ s#.*(PerlDaemonModules)/(.*)\.pm$#$1::$2#;
                         $logger->logmsg("Creating module instance of $name");
                         $loadedmodules{$name} = eval "${name}->new(\$conf)";
+                        $scheduler{$name}{lastrun} = 0.0;
+                        $scheduler{$name}{interval} = $conf->{modulesruninterval};
                 }
 
         } else {
@@ -27,6 +32,7 @@ sub new ($$$) {
         }
 
         $conf->{modules} = \%loadedmodules;
+        $conf->{scheduler} = \%scheduler;
         return $self;
 }
 
@@ -35,6 +41,7 @@ sub do ($) {
 	my $conf = $self->{conf};
 	my $logger = $conf->{logger};
 	my $modules = $conf->{modules};
+	my $scheduler = $conf->{scheduler};
 
         unless (%$modules) {
                 $logger->warn("No modules are loaded!");
@@ -42,6 +49,7 @@ sub do ($) {
                 while (my ($k, $v) = each %$modules) {
                         $logger->logmsg("Triggering $k");
                         $v->do();
+                        $scheduler->{$k} = gettimeofday;
                 }
         }
 }
