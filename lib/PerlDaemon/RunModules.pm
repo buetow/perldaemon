@@ -2,7 +2,7 @@ package PerlDaemon::RunModules;
 
 use Time::HiRes qw(gettimeofday tv_interval);
 
-sub new ($$$) {
+sub new ($$) {
 	my ($class, $conf) = @_;
 
 	my $self = bless { conf => $conf }, $class;
