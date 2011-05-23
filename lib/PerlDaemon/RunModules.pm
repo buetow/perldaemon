@@ -33,6 +33,7 @@ sub new ($$$) {
 
         $conf->{modules} = \%loadedmodules;
         $conf->{scheduler} = \%scheduler;
+
         return $self;
 }
 
