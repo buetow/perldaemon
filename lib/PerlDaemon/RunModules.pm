@@ -7,7 +7,7 @@ sub new ($$) {
 
 	my $self = bless { conf => $conf }, $class;
 
-	my $modulesdir = $conf->{'daemon.modulesdir'};
+	my $modulesdir = $conf->{'daemon.modules.dir'};
 	my $logger = $conf->{logger};
         my %loadedmodules;
         my %scheduler;
@@ -25,7 +25,7 @@ sub new ($$) {
                         # TODO: Add eval catching jost un case for errors
                         $loadedmodules{$name} = eval "${name}->new(\$conf)";
                         $scheduler{$name}{lastrun} = 0.0;
-                        $scheduler{$name}{interval} = $conf->{modulesruninterval};
+                        $scheduler{$name}{interval} = $conf->{'modules.runinterval'};
                 }
 
         } else {
@@ -49,6 +49,7 @@ sub do ($) {
                 $logger->warn("No modules are loaded!");
         } else {
                 while (my ($k, $v) = each %$modules) {
+                          
                         $logger->logmsg("Triggering $k");
                         $scheduler->{$k}{lastrun} = gettimeofday;
                         $v->do();
