@@ -49,10 +49,11 @@ sub do ($) {
                 $logger->warn("No modules are loaded!");
         } else {
                 while (my ($k, $v) = each %$modules) {
-                          
+                        my $now = gettimeofday;
+#$logger->logmsg(tv_interval($now, $scheduler->{$k}{lastrun}));
                         $logger->logmsg("Triggering $k");
-                        $scheduler->{$k}{lastrun} = gettimeofday;
-                        $v->do();
+                        $scheduler->{$k}{lastrun} = $now;
+                        #$v->do();
                 }
         }
 }

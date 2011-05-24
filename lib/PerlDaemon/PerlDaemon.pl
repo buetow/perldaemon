@@ -83,7 +83,7 @@ sub readconf ($) {
 	# Check
 	my $msg = 'Missing property:';
 
-	foreach (qw(wd loopinterval alivefile pidfile logfile)) {
+	foreach (qw(wd loopinterval alivefile pidfile logfile daemonize)) {
 		my $key = "daemon.$_";
 		die "$msg $key\n" unless exists $conf{$key};
 	}
@@ -157,7 +157,13 @@ my $conf = readconf shift;
 $conf->{logger} = PerlDaemon::Logger->new($conf);
 
 prestartup $conf;
-daemonize $conf;
+
+if ($conf->{'daemon.daemonize'} ne 'yes') {
+        print "Running in foreground...\n";
+} else {
+        daemonize $conf;
+}
+
 sighandlers $conf;
 daemonloop $conf;
 
