@@ -25,7 +25,7 @@ sub new ($$) {
                         # TODO: Add eval catching jost un case for errors
                         $loadedmodules{$name} = eval "${name}->new(\$conf)";
                         $scheduler{$name}{lastrun} = [0,0];
-                        $scheduler{$name}{interval} = $conf->{'modules.runinterval'};
+                        $scheduler{$name}{interval} = $conf->{'daemon.modules.runinterval'};
                 }
 
         } else {
@@ -50,10 +50,14 @@ sub do ($) {
         } else {
                 while (my ($k, $v) = each %$modules) {
                         my $now = [gettimeofday];
-                        $logger->logmsg(tv_interval($now, $scheduler->{$k}{lastrun}));
-                        $logger->logmsg("Triggering $k");
-                        $scheduler->{$k}{lastrun} = $now;
-                        #$v->do();
+                        my $timediff = tv_interval($scheduler->{$k}{lastrun}, $now);
+                        my $interval = $scheduler->{$k}{interval};
+
+                        if ($timediff >= $interval) {
+                                $logger->logmsg("Triggering $k (last run before ${timediff}s ; wanted interval: ${interval}s)");
+                                $scheduler->{$k}{lastrun} = $now;
+                                $v->do();
+                        }
                 }
         }
 }
