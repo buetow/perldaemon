@@ -14,10 +14,13 @@ sub logmsg ($$) {
 	my ($self, $msg) = @_;
 	my $conf = $self->{conf};
 	my $logfile = $conf->{'daemon.logfile'};
+        my $logline = localtime()." (PID $$): $msg\n";
 
 	open my $fh, ">>$logfile" or die "Can't write logfile $logfile: $!\n";
-	print $fh localtime()." (PID $$): $msg\n";
+	print $fh $logline;
 	close $fh;
+
+        print $logline if $conf->{'daemon.daemonize'} ne 'yes';
 
         return undef;
 }

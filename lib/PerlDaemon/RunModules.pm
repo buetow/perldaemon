@@ -24,7 +24,7 @@ sub new ($$) {
                         $logger->logmsg("Creating module instance of $name");
                         # TODO: Add eval catching jost un case for errors
                         $loadedmodules{$name} = eval "${name}->new(\$conf)";
-                        $scheduler{$name}{lastrun} = 0.0;
+                        $scheduler{$name}{lastrun} = [0,0];
                         $scheduler{$name}{interval} = $conf->{'modules.runinterval'};
                 }
 
@@ -49,8 +49,8 @@ sub do ($) {
                 $logger->warn("No modules are loaded!");
         } else {
                 while (my ($k, $v) = each %$modules) {
-                        my $now = gettimeofday;
-#$logger->logmsg(tv_interval($now, $scheduler->{$k}{lastrun}));
+                        my $now = [gettimeofday];
+                        $logger->logmsg(tv_interval($now, $scheduler->{$k}{lastrun}));
                         $logger->logmsg("Triggering $k");
                         $scheduler->{$k}{lastrun} = $now;
                         #$v->do();
