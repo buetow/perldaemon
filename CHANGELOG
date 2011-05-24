@@ -1,3 +1,8 @@
+Di 24. Mai 08:46:09 CEST 2011
+* Renamed modules config options
+        daemon.modulesruninterval -> daemon.modules.runiterval 
+        daemon.modulesdir -> daemon.modules.dir 
+
 Mo 23. Mai 08:30:06 CEST 2011
 * Added TODO list
 
