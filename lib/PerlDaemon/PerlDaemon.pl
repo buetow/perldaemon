@@ -7,6 +7,7 @@ use warnings;
 
 use Shell qw(mv);
 use POSIX qw(setsid strftime);
+use Time::HiRes qw(gettimeofday tv_interval);
 
 use PerlDaemon::Logger;
 use PerlDaemon::RunModules;
@@ -148,10 +149,19 @@ sub daemonloop ($) {
 	my $loopinterval = $conf->{'daemon.loopinterval'};
 
 	my $loop = shift;
-	for (my $i = 1;;++$i) {
-		$rmodule->do();
-		sleep $loopinterval;
-		alive $conf;
+        my $lastrun = [0,0];
+
+	for (;;) {
+                my $now = [gettimeofday];
+                my $timediff = tv_interval($lastrun, $now);
+
+                if ($timediff >= $loopinterval) {
+                        $lastrun = $now;                                
+		        $rmodule->do();
+                        alive $conf;
+                }
+
+                sleep $loopinterval / 10;
 	}
 }
 
