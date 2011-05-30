@@ -45,8 +45,9 @@ case $ARG in
 	;;
 
 	restart)
-                stop
-                start
+                shift
+                stop 
+                start $@
 	;;
 
 	logrotate)
