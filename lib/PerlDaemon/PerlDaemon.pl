@@ -62,10 +62,11 @@ sub writepid ($) {
 }
 
 
-sub readconf ($) {
-	my $conffile = shift;
+sub readconf ($%) {
+	my ($confile, %opts) = @_;
 
-	open my $fh, $conffile or die "Can't read $conffile\n";
+	open my $fh, $confile or 
+                die "Can't read config file $confile (specify using config=filepath)\n";
 	my %conf;
 	
 	while (<$fh>) {
@@ -88,6 +89,7 @@ sub readconf ($) {
 		die "$msg $key\n" unless exists $conf{$key};
 	}
 
+        @conf{keys %opts} = values %opts;
 	return \%conf;
 }
 
@@ -153,7 +155,21 @@ sub daemonloop ($) {
 	}
 }
 
-my $conf = readconf shift;
+sub getopts (@) {
+        my %opts;
+
+        for my $opt (@_) {
+                next unless $opt =~ /=/;
+                my ($key, $val) = split '=', $opt, 2;
+                $opts{$key} = $val;
+        }
+
+        return %opts;
+}
+
+my %opts = getopts @ARGV;
+
+my $conf = readconf $opts{config}, %opts;
 $conf->{logger} = PerlDaemon::Logger->new($conf);
 
 prestartup $conf;

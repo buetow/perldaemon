@@ -1,3 +1,2 @@
 * Complete Time::HiRes job scheduler
 * Add error handling (catch eval if dynamic loadable module errors)
-* Allow command line arguments

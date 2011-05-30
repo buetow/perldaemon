@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash 
 
 declare -r ARG=$1
 declare -a LIBPATHS=(./lib ../lib /lib /usr/lib /usr/local/lib /opt/lib)
@@ -17,7 +17,7 @@ fi
 
 start () { 
         echo Starting daemon now...
-        perl -I$LIBDIR $LIBDIR/PerlDaemon/PerlDaemon.pl ./conf/perldaemon.conf
+        perl -I$LIBDIR $LIBDIR/PerlDaemon/PerlDaemon.pl config=./conf/perldaemon.conf $@
 }
 
 stop () { 
@@ -36,7 +36,8 @@ logrotate () {
 
 case $ARG in
 	start)
-                start
+                shift
+                start $@
 	;;
 
 	stop)
