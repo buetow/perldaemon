@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-
-# Minimal PerlDaemon (c) 2011 Paul Buetow
+# PerlDaemon (c) 2010, 2011, Dipl.-Inform. (FH) Paul Buetow (http://perldaemon.buetow.org)
 
 use strict;
 use warnings;

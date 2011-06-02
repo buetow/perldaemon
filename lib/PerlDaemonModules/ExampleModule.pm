@@ -1,3 +1,5 @@
+# PerlDaemon (c) 2010, 2011, Dipl.-Inform. (FH) Paul Buetow (http://perldaemon.buetow.org)
+
 package PerlDaemonModules::ExampleModule;
 
 sub new ($$$) {

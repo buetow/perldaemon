@@ -1,4 +1,5 @@
 #!/usr/bin/env bash 
+# PerlDaemon (c) 2010, 2011, Dipl.-Inform. (FH) Paul Buetow (http://perldaemon.buetow.org)
 
 declare -r ARG=$1
 declare -a LIBPATHS=(./lib ../lib /lib /usr/lib /usr/local/lib /opt/lib)
