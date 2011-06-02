@@ -1,2 +1,2 @@
-* Complete Time::HiRes job scheduler
-* Add error handling (catch eval if dynamic loadable module errors)
+* Add documentation
+* Add source headers (c)

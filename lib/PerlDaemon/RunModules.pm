@@ -16,16 +16,24 @@ sub new ($$) {
                 $logger->logmsg("Loading modules from $modulesdir");
                 for my $module (<$modulesdir/*.pm>) {
                         $logger->logmsg("Loading $module");
-                        require $module;
+                        eval "require '$module'";
+                        $logger->warn("Could not load module source file $module: $@")
+                                if defined $@ and length $@;
                 }
 
                 for my $name (grep /PerlDaemonModules/, keys %INC) {
                         $name =~ s#.*(PerlDaemonModules)/(.*)\.pm$#$1::$2#;
-                        $logger->logmsg("Creating module instance of $name");
-                        # TODO: Add eval catching jost un case for errors
-                        $loadedmodules{$name} = eval "${name}->new(\$conf)";
-                        $scheduler{$name}{lastrun} = [0,0];
-                        $scheduler{$name}{interval} = $conf->{'daemon.modules.runinterval'};
+                        my $module = eval "${name}->new(\$conf)";
+
+                        if (defined $@ and length $@) {
+                                $logger->warn("Could not create module instance $name: $@");        
+
+                        } else {
+                                $loadedmodules{$name} = $module;
+                                $scheduler{$name}{lastrun} = [0,0];
+                                $scheduler{$name}{interval} = $conf->{'daemon.modules.runinterval'};
+                                $logger->logmsg("Created module instance $name");
+                        }
                 }
 
         } else {

@@ -1,3 +1,6 @@
+Do 2. Jun 11:09:25 CEST 2011
+* Added module load error handling 
+
 Mo 30. Mai 21:29:20 CEST 2011
 * Implemented Time::HiRes job scheduling
 * Added passing of startup options. E.g. 
