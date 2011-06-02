@@ -64,7 +64,7 @@ sub do ($) {
                         my $interval = $scheduler->{$k}{interval};
 
                         if ($timediff >= $interval) {
-                                $logger->logmsg("Triggering $k (last run before ${timediff}s; wanted interval: ${interval}s)");
+                                $logger->logmsg("Triggering $k (last triggered before ${timediff}s; wanted interval: ${interval}s)");
                                 $scheduler->{$k}{lastrun} = $now;
                                 $v->do();
                         }
