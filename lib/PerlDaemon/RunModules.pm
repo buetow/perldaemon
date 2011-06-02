@@ -57,6 +57,7 @@ sub do ($) {
 
         unless (%$modules) {
                 $logger->warn("No modules are loaded!");
+
         } else {
                 while (my ($k, $v) = each %$modules) {
                         my $now = [gettimeofday];
@@ -64,11 +65,20 @@ sub do ($) {
                         my $interval = $scheduler->{$k}{interval};
 
                         if ($timediff >= $interval) {
-                                $logger->logmsg("Triggering $k (last triggered before ${timediff}s; wanted interval: ${interval}s)");
+                                my $carry = $timediff - $interval;
+                                $logger->logmsg("Triggering $k (last triggered before ${timediff}s; carry: ${carry}s; wanted interval: ${interval}s)");
+
+                                # TODO: carry handling 
+                                #if ($firstloop == 0) {
+                                #}
+
                                 $scheduler->{$k}{lastrun} = $now;
                                 $v->do();
+
                         }
                 }
+
+                $firstloop = 0;
         }
 }
 
