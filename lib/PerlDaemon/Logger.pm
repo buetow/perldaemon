@@ -1,5 +1,8 @@
 package PerlDaemon::Logger;
 
+use strict;
+use warnings;
+
 use Shell qw(mv);
 use POSIX qw(strftime);
 

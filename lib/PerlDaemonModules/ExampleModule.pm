@@ -2,6 +2,9 @@
 
 package PerlDaemonModules::ExampleModule;
 
+use strict;
+use warnings;
+
 sub new ($$$) {
 	my ($class, $conf) = @_;
 
