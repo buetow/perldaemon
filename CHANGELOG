@@ -1,3 +1,7 @@
+Mo 6. Jun 09:03:57 CEST 2011
+* Added './control foreground' startup option
+* Added correct time carrying
+
 Do 2. Jun 11:09:25 CEST 2011
 * Added module load error handling 
 
