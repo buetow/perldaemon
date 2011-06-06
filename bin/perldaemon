@@ -55,8 +55,12 @@ case $ARG in
                 logrotate
 	;;
 
+	foreground)
+                start daemon.daemonize=no $@
+	;;
+
 	*)
-                echo "Usage: $0 <start|stop|restart|logrotate>"
+                echo "Usage: $0 <start|stop|restart|logrotate|foreground>"
                 exit 1
 	;;
 esac
