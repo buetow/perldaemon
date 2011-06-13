@@ -5,7 +5,7 @@ TOC:
 04. HIGH RESOLUTION SCHEDULING TIME
 05. WRITING YOUR OWN MODULES
 
-01 - HELLO WORLD
+01. HELLO WORLD
 
 RunModuleemon is a minimal linux/unix daemon programmed in Perl. 
 It can be extended to fit any task...
