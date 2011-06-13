@@ -25,7 +25,6 @@ The perldaemon website is located at http://perldaemon.buetow.org
 # Starting
  ./bin/perldaemon start (or shortcut ./control start)
 
-
 # Stopping
  ./bin/perldaemon stop (or shortcut ./control stop)
 
