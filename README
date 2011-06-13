@@ -39,7 +39,7 @@ options enter "./control" without any argument.
 Configurations can be set in ./conf/perldaemon.conf. If you want to change
 a property only once it's possible to specify it on command line. All 
 available properties can be seen using ./control keys (caution: this list
-in this document may be outdated, please run ./control keys by your own too!)
+in this document may be outdated, please run ./control keys by yourself too!)
 
 pb@titania:~/svn/utils/perldaemon/trunk$ ./control keys
 # Path to the logfile
@@ -98,6 +98,10 @@ turn that off and on).
  vi YourModule.pm
  cd -
  ./bin/perldaemon restart (or shortcurt ./control restart)
+
+Now watch ./log/perldaemon.log to see everything runs fine. It is a good
+practise to test your modules in 'foreground mode' (see above how to do
+that).
 
 Btw: You can install as many modules in parallel as whished. But they are run 
 in sequential order (in future they can also run in parallel using several
