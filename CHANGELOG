@@ -1,6 +1,14 @@
+Mo 13. Jun 11:41:41 CEST 2011
+* Released PerlDaemon v1.2
+  
+Mo 13. Jun 11:40:49 CEST 2011
+* Added documentation (README file)
+* Added './control keys' which shows all the available properties
+
 Mo 6. Jun 09:03:57 CEST 2011
 * Added './control foreground' startup option
 * Added correct time carrying
+* Renamed TODO into WHISHLIST
 
 Do 2. Jun 11:09:25 CEST 2011
 * Added module load error handling 

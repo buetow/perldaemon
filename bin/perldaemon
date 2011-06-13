@@ -35,6 +35,10 @@ logrotate () {
         kill -HUP $(cat ./run/perldaemon.pid)
 }
 
+keys () {
+        perl -I$LIBDIR $LIBDIR/PerlDaemon/PerlDaemon.pl config=./conf/perldaemon.conf keys=1 $@
+}
+
 case $ARG in
 	start)
                 shift
@@ -59,8 +63,12 @@ case $ARG in
                 start daemon.daemonize=no $@
 	;;
 
+	keys)
+                keys $@
+	;;
+
 	*)
-                echo "Usage: $0 <start|stop|restart|logrotate|foreground>"
+                echo "Usage: $0 <start|stop|restart|logrotate|foreground|keys> [key1=val1 [[key2=val2] ...]]"
                 exit 1
 	;;
 esac

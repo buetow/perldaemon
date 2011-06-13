@@ -1,2 +1,2 @@
-* Add documentation
+* Add parallel module execution support
 * Add special SIGNAL handling (e.g. trigger modules)

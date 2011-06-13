@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+
 # PerlDaemon (c) 2010, 2011, Dipl.-Inform. (FH) Paul Buetow (http://perldaemon.buetow.org)
 
 use strict;
@@ -64,12 +65,18 @@ sub writepid ($) {
 
 sub readconf ($%) {
 	my ($confile, %opts) = @_;
+        my $desc;
 
 	open my $fh, $confile or 
                 die "Can't read config file $confile (specify using config=filepath)\n";
+
 	my %conf;
-	
 	while (<$fh>) {
+                if (/^#(.*)/) {
+                        $desc = $1;
+                        next;
+                }
+
 		next if /^[\t\w]+#/;
 		s/#.*//;
 
@@ -77,6 +84,11 @@ sub readconf ($%) {
 		next unless defined $val;
 
 		$conf{$key} = $val;	
+
+                if (defined $desc) {
+		        $conf{"$key.desc"} = $desc;	
+                        $desc = undef;
+                }
 	}
 
 	close $fh;
@@ -164,6 +176,16 @@ sub daemonloop ($) {
 	}
 }
 
+sub showkeys ($) {
+        my $conf = shift;
+        for my $key (grep !/(^keys$)|(^config$)|(\.desc$)/, keys %$conf) {
+                print '#' . (exists $conf->{"$key.desc"}
+                        ?  $conf->{"$key.desc"} 
+                        : ' Undocumented property');
+                print "\n$key=$conf->{$key}\n\n";
+        }
+}
+
 sub getopts (@) {
         my %opts;
 
@@ -179,6 +201,12 @@ sub getopts (@) {
 my %opts = getopts @ARGV;
 
 my $conf = readconf $opts{config}, %opts;
+
+if (exists $conf->{keys}) {
+        showkeys($conf);
+        exit 0;
+}
+
 $conf->{logger} = PerlDaemon::Logger->new($conf);
 
 prestartup $conf;

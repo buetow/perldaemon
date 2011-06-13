@@ -1,4 +1,11 @@
-HELLO WORLD
+TOC:
+01. HELLO WORLD
+02. QUICK START GUIDE
+03. CONFIGURATION
+04. HIGH RESOLUTION SCHEDULING TIME
+05. WRITING YOUR OWN MODULES
+
+01 - HELLO WORLD
 
 RunModuleemon is a minimal linux/unix daemon programmed in Perl. 
 It can be extended to fit any task...
@@ -13,19 +20,87 @@ It supports:
 
 The perldaemon website is located at http://perldaemon.buetow.org
 
-QUICK START GUIDE:
+02. QUICK START GUIDE:
 
 # Starting
  ./bin/perldaemon start (or shortcut ./control start)
 
+
 # Stopping
  ./bin/perldaemon stop (or shortcut ./control stop)
 
-# Writing your own modules:
+# Alternatively: Starting in foreground 
+./bin/perldaemon start daemon.daemonize=no (or shortcut ./control foreground)
+
+To stop the daemon then just hit Ctrl+C. To see more available startup
+options enter "./control" without any argument.
+
+03. CONFIGURATION
+
+Configurations can be set in ./conf/perldaemon.conf. If you want to change
+a property only once it's possible to specify it on command line. All 
+available properties can be seen using ./control keys (caution: this list
+in this document may be outdated, please run ./control keys by your own too!)
+
+pb@titania:~/svn/utils/perldaemon/trunk$ ./control keys
+# Path to the logfile
+daemon.logfile=./log/perldaemon.log
+
+# The amount of seconds until the next event look takes place
+daemon.loopinterval=1
+
+# Path to the modules dir
+daemon.modules.dir=./lib/PerlDaemonModules
+
+# Specifies either the daemon should run in daemon or foreground mode
+daemon.daemonize=yes
+
+# Path to the pidfile
+daemon.pidfile=./run/perldaemon.pid
+
+# Each module should run every runinterval seconds
+daemon.modules.runinterval=3
+
+# Path to the alive file (is touched every loopinterval seconds, usable to monitor)
+daemon.alivefile=./run/perldaemon.alive
+
+# Specifies the working directory
+daemon.wd=./
+
+So lets start the daemon using as its loop interval 10 seconds:
+
+$ ./control keys | grep daemon.loopinterval
+daemon.loopinterval=1
+$ ./control keys daemon.loopinterval=10 | grep daemon.loopinterval
+daemon.loopinterval=10
+$ ./control start daemon.loopinterval=10; sleep 10; tail -n 2 log/perldaemon.log
+Starting daemon now...
+Mon Jun 13 11:29:27 2011 (PID 2838): Triggering PerlDaemonModules::ExampleModule 
+(last triggered before 10.002106s; carry: 7.002106s; wanted interval: 3s)
+Mon Jun 13 11:29:27 2011 (PID 2838): ExampleModule Test 2
+Starting daemon now...
+$ ./control stop
+Stopping daemon now...
+
+If you want to change that property forever either edit perldaemon.conf or do this:
+$ ./control keys daemon.loopinterval=10 > new.conf; mv new.conf conf/perldaemon.conf
+
+04. HIGH RESOLUTION SCHEDULING TIME
+
+PerlDaemon uses Time::HiRes to make sure that all the events run in correct
+intervals. Each loop run a time carry value is recorded and added to the next
+loop run in order to catch up lost time (in future there will be an option to
+turn that off and on).
+
+05. WRITING YOUR OWN MODULES:
+
  cd ./lib/PerlDaemonModules/
  cp ExampleModule.pm YourModule.pm
  vi YourModule.pm
  cd -
  ./bin/perldaemon restart (or shortcurt ./control restart)
 
-Btw: You can install as many modules in parallel as whished.
+Btw: You can install as many modules in parallel as whished. But they are run 
+in sequential order (in future they can also run in parallel using several
+threads or processes).
+
