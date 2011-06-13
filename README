@@ -7,7 +7,7 @@ TOC:
 
 01. HELLO WORLD
 
-RunModuleemon is a minimal linux/unix daemon programmed in Perl. 
+PerlDaemon is a minimal linux/unix daemon programmed in Perl. 
 It can be extended to fit any task...
 
 It supports:
