@@ -1,6 +1,6 @@
 # PerlDaemon (c) 2010, 2011, Dipl.-Inform. (FH) Paul Buetow (http://perldaemon.buetow.org)
 
-package PerlDaemonModules::ExampleModule;
+package PerlDaemonModules::ExampleModule2;
 
 use strict;
 use warnings;

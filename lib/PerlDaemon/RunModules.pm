@@ -4,6 +4,7 @@ package PerlDaemon::RunModules;
 
 use strict;
 use warnings;
+use threads qw(exit stringify);
 use Time::HiRes qw(gettimeofday tv_interval);
 
 sub new ($$) {
@@ -18,6 +19,7 @@ sub new ($$) {
 
         if (-d $modulesdir) {
                 $logger->logmsg("Loading modules from $modulesdir");
+
                 for my $module (<$modulesdir/*.pm>) {
                         $logger->logmsg("Loading $module");
                         eval "require '$module'";
@@ -54,8 +56,7 @@ sub new ($$) {
 
 sub do ($) {
 	my $self = shift;
-	my $conf = $self->{conf};
-	my $logger = $conf->{logger};
+	my $conf = $self->{conf}; my $logger = $conf->{logger};
 	my $modules = $conf->{modules};
 	my $scheduler = $conf->{scheduler};
 

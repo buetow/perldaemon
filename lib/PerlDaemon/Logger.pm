@@ -2,28 +2,61 @@ package PerlDaemon::Logger;
 
 use strict;
 use warnings;
+use threads;
+use threads::shared;
 
 use Shell qw(mv);
 use POSIX qw(strftime);
 
 $| = 1;
 
+our $SELF;
+
+$SIG{'USR2'} = sub {
+        $SELF->flushlogs();
+};
+
 sub new ($$) {
 	my ($class, $conf) = @_;
-	return bless { conf => $conf }, $class;
+
+        die "Instance already exists" if defined $SELF;
+	$SELF = bless { conf => $conf }, $class;
+
+        $SELF->{queue} = [];
+        share $SELF->{queue};
+
+        return $SELF;
 }
 
 sub logmsg ($$) {
 	my ($self, $msg) = @_;
 	my $conf = $self->{conf};
-	my $logfile = $conf->{'daemon.logfile'};
         my $logline = localtime()." (PID $$): $msg\n";
 
-	open my $fh, ">>$logfile" or die "Can't write logfile $logfile: $!\n";
-	print $fh $logline;
-	close $fh;
 
-        print $logline if $conf->{'daemon.daemonize'} ne 'yes';
+        { lock $self->{queue};
+                push @{$self->{queue}}, $logline;
+        }
+
+        $self->flushlogs();
+
+        return undef;
+}
+
+sub flushlogs ($$) {
+	my ($self, $msg) = @_;
+	my $conf = $self->{conf};
+	my $logfile = $conf->{'daemon.logfile'};
+
+        { lock $self->{queue};
+	        open my $fh, ">>$logfile" or die "Can't write logfile $logfile: $!\n";
+                for my $logline (@{$self->{queue}}) {
+                        print $fh $logline;
+                        print $logline if $conf->{'daemon.daemonize'} ne 'yes';
+                }
+	        close $fh;
+                @{$self->{queue}} = ();
+        }
 
         return undef;
 }
