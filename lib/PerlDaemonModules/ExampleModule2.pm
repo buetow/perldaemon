@@ -10,7 +10,7 @@ sub new ($$$) {
 
 	my $self = bless { conf => $conf }, $class;
 
-        # Store some private module stuff
+        # Store some private persistent module stuff
         $self->{counter} = 0;
 
         return $self;
