@@ -6,40 +6,40 @@ use warnings;
 $| = 1;
 
 sub new ($$) {
-	my ($class, $conf) = @_;
-	my $self = $SELF = bless { conf => $conf }, $class;
+  my ($class, $conf) = @_;
+  my $self = $SELF = bless { conf => $conf }, $class;
 
-        return $self;
+  return $self;
 }
 
 sub _pushmsg ($$) {
-	my ($self, $msg) = @_;
-	my $conf = $self->{conf};
-        my $msgqueue = $conf->{msgqueue};
+  my ($self, $msg) = @_;
+  my $conf = $self->{conf};
+  my $msgqueue = $conf->{msgqueue};
 
-        push @$msgqueue, $msg;
+  push @$msgqueue, $msg;
 }
 
 sub logmsg ($$) {
-	my ($self, $msg) = @_;
+  my ($self, $msg) = @_;
 
-        my $logline = localtime()." (PID $$): $msg\n";
-        $self->_pushmsg($logline);
+  my $logline = localtime()." (PID $$): $msg\n";
+  $self->_pushmsg($logline);
 
-        return undef;
+  return undef;
 }
 
 sub err ($$) {
-	my ($self, $msg) = @_;
-	$self->logmsg($msg);
-	die "$msg\n";
+  my ($self, $msg) = @_;
+  $self->logmsg($msg);
+  die "$msg\n";
 }
 
 sub warn ($$) {
-	my ($self, $msg) = @_;
-	$self->logmsg("WARNING: $msg");
+  my ($self, $msg) = @_;
+  $self->logmsg("WARNING: $msg");
 
-        return undef;
+  return undef;
 }
 
 1;

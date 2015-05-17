@@ -13,78 +13,78 @@ $| = 1;
 our $SELF;
 
 $SIG{'USR2'} = sub {
-        $SELF->flushlogs();
+  $SELF->flushlogs();
 };
 
 sub new ($$) {
-	my ($class, $conf) = @_;
+  my ($class, $conf) = @_;
 
-        die "Instance already exists" if defined $SELF;
-	$SELF = bless { conf => $conf }, $class;
+  die "Instance already exists" if defined $SELF;
+  $SELF = bless { conf => $conf }, $class;
 
-        $SELF->{queue} = [];
-        share $SELF->{queue};
+  $SELF->{queue} = [];
+  share $SELF->{queue};
 
-        return $SELF;
+  return $SELF;
 }
 
 sub logmsg ($$) {
-	my ($self, $msg) = @_;
-	my $conf = $self->{conf};
-        my $logline = localtime()." (PID $$): $msg\n";
+  my ($self, $msg) = @_;
+  my $conf = $self->{conf};
+  my $logline = localtime()." (PID $$): $msg\n";
 
 
-        { lock $self->{queue};
-                push @{$self->{queue}}, $logline;
-        }
+  { lock $self->{queue};
+    push @{$self->{queue}}, $logline;
+  }
 
-        $self->flushlogs();
+  $self->flushlogs();
 
-        return undef;
+  return undef;
 }
 
 sub flushlogs ($$) {
-	my ($self, $msg) = @_;
-	my $conf = $self->{conf};
-	my $logfile = $conf->{'daemon.logfile'};
+  my ($self, $msg) = @_;
+  my $conf = $self->{conf};
+  my $logfile = $conf->{'daemon.logfile'};
 
-        { lock $self->{queue};
-	        open my $fh, ">>$logfile" or die "Can't write logfile $logfile: $!\n";
-                for my $logline (@{$self->{queue}}) {
-                        print $fh $logline;
-                        print $logline if $conf->{'daemon.daemonize'} ne 'yes';
-                }
-	        close $fh;
-                @{$self->{queue}} = ();
-        }
+  { lock $self->{queue};
+    open my $fh, ">>$logfile" or die "Can't write logfile $logfile: $!\n";
+    for my $logline (@{$self->{queue}}) {
+      print $fh $logline;
+      print $logline if $conf->{'daemon.daemonize'} ne 'yes';
+    }
+    close $fh;
+    @{$self->{queue}} = ();
+  }
 
-        return undef;
+  return undef;
 }
 
 sub err ($$) {
-	my ($self, $msg) = @_;
-	$self->logmsg($msg);
-	die "$msg\n";
+  my ($self, $msg) = @_;
+  $self->logmsg($msg);
+  die "$msg\n";
 }
 
 sub warn ($$) {
-	my ($self, $msg) = @_;
-	$self->logmsg("WARNING: $msg");
+  my ($self, $msg) = @_;
+  $self->logmsg("WARNING: $msg");
 
-        return undef;
+  return undef;
 }
 
 sub rotatelog ($) {
-	my $self = shift;
-	my $conf = $self->{conf};
-	my $logfile = $conf->{'daemon.logfile'};
+  my $self = shift;
+  my $conf = $self->{conf};
+  my $logfile = $conf->{'daemon.logfile'};
 
-	$self->logmsg('Rotating logfile');
+  $self->logmsg('Rotating logfile');
 
-	my $timestr = strftime "%Y%m%d-%H%M%S", localtime();
-	mv($logfile, "$logfile.$timestr");	
+  my $timestr = strftime "%Y%m%d-%H%M%S", localtime();
+  mv($logfile, "$logfile.$timestr");  
 
-        return undef;
+  return undef;
 }
 
 1;
