@@ -102,7 +102,7 @@ Now watch ./log/perldaemon.log to see everything runs fine. It is a good
 practise to test your modules in 'foreground mode' (see above how to do
 that).
 
-Btw: You can install as many modules in parallel as whished. But they are run 
+BTW: You can install as many modules in parallel as wished. But they are run 
 in sequential order (in future they can also run in parallel using several
 threads or processes).
 
