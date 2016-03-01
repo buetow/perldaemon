@@ -7,8 +7,8 @@ TOC:
 
 01. HELLO WORLD
 
-PerlDaemon is a minimal linux/unix daemon programmed in Perl. 
-It can be extended to fit any task...
+PerlDaemon is a minimal daemon for Linux and other UNIX a like operating system
+programmed in Perl.  It can be extended to fit any task...
 
 It supports:
 * Automatic daemonizing
